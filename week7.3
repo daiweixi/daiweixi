@@ -1,0 +1,82 @@
+public class OrderBottom implements OrderContent {
+
+    private Order order;
+
+    private OnceSendView2 shopImageView;
+    private List<Order_goods> list;
+    private ACache aCache;
+
+    public OrderBottom(Order order, List<Order_goods> list) {
+
+        this.order = order;
+        this.list = list;
+    }
+
+    @Override
+    public int getLayout() {
+        return R.layout.item_list_list;
+    }
+
+    @Override
+    public boolean isClickable() {
+        return true;
+    }
+
+    public Order order() {
+        return order;
+    }
+
+    @Override
+    public View getView(final Context context, View convertView, LayoutInflater inflater) {
+        aCache = ACache.get(context);
+        inflater = LayoutInflater.from(context);
+        convertView = inflater.inflate(getLayout(), null);
+
+        GTextView orderTotal = (GTextView) convertView.findViewById(R.id.tv_order_amount1);
+        GTextView tv_order_datetime = (GTextView) convertView.findViewById(R.id.tv_order_datetime);
+        final GButton oncesend = (GButton) convertView.findViewById(R.id.btn_send1);
+        GTextView yunfei_text = (GTextView) convertView.findViewById(R.id.yunfei_text);
+
+        yunfei_text.setText("（含运费: ¥ "+order.getShipping_fee()+")");
+
+        orderTotal.setText(order.getOrder_amount());
+        tv_order_datetime.setText(Data_Time.getDateToString(order.getAdd_time()));
+        final View finalConvertView = convertView;
+        if (order.getStatus().equals("20")) {
+            oncesend.setText("立即发货");
+
+
+            oncesend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent otherintent = new Intent(context, Message_Delivery.class);
+                    otherintent.putExtra("order_id", order.getOrder_id());
+                    otherintent.putExtra("token", aCache.getAsString("token"));
+                    context.startActivity(otherintent);
+                }
+            });
+        } else if (order.getStatus().equals("30")){
+            oncesend.setBackgroundResource(R.color.highlight_color);
+            oncesend.setText("查看物流");
+            oncesend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, Message_Logistics.class);
+                    intent.putExtra("order_id", order.getOrder_id());
+                    context.startActivity(intent);
+                }
+            });
+
+        }
+        else
+        {
+            oncesend.setVisibility(View.GONE);
+
+        }
+
+        return convertView;
+    }
+
+
+}
