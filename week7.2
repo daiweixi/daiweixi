@@ -1,0 +1,93 @@
+public class OrderIMiddle implements OrderContent {
+    private Order_goods order_goods;
+    private ImageLoader imageLoader;
+    private DisplayImageOptions options;
+
+    List<Order_goods> order_goodsList;
+    private String status;
+
+    public OrderIMiddle(Order_goods order_goods, String status) {
+        this.order_goods = order_goods;
+        order_goodsList = new ArrayList<Order_goods>();
+        order_goodsList.add(order_goods);
+        this.status = status;
+
+        imageLoader = ImageLoader.getInstance();
+        // 使用DisplayImageOptions.Builder()创建DisplayImageOptions
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.publicloading)
+                .showImageForEmptyUri(R.drawable.publicloading)
+                .showImageOnFail(R.drawable.publicloading)
+                .cacheInMemory(true)
+                .build();
+
+    }
+
+    @Override
+    public int getLayout() {
+        return R.layout.listitem_goods;
+    }
+
+    @Override
+    public boolean isClickable() {
+        return true;
+    }
+
+    public Order_goods order_goods() {
+        return order_goods;
+    }
+
+    @Override
+    public View getView(final Context context, View convertView, LayoutInflater inflater) {
+
+        inflater = LayoutInflater.from(context);
+        convertView = inflater.inflate(getLayout(), null);
+
+        GImageView mImage = (GImageView) convertView.findViewById(R.id.iv_goods_image1);
+        GTextView goods_info = (GTextView) convertView.findViewById(R.id.tv_goods_info1);
+        GTextView goods_attribute = (GTextView) convertView.findViewById(R.id.tv_goods_attribute1);
+        GTextView goods_num = (GTextView) convertView.findViewById(R.id.tv_goods_num1);
+        GTextView goods_price = (GTextView) convertView.findViewById(R.id.tv_goods_price1);
+
+
+        goods_info.setText(order_goods.getGoods_name());
+        goods_attribute.setText(order_goods.getSpecification());
+        goods_num.setText("x" + order_goods.getQuantity());
+        goods_price.setText("¥:" + order_goods.getPrice());
+       Log.i("TAG", "order_goods.getOrder_id()=" + order_goods.getOrder_id());
+
+
+        imageLoader.init(FileUtils.getCache(context));
+
+        imageLoader.displayImage(order_goods.getGoods_image(), mImage, options);
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (status) {
+                    case "40":
+                        Intent intent = new Intent(context, Message_Logistics.class);
+                        intent.putExtra("order_id", order_goods.getOrder_id());
+                        context.startActivity(intent);
+                        break;
+                    case "30":
+                        Intent intent2 = new Intent(context, Message_Logistics.class);
+                        intent2.putExtra("order_id", order_goods.getOrder_id());
+                        context.startActivity(intent2);
+                        break;
+                    case "20":
+                        Intent intent3 = new Intent(context, Message_Delivery.class);
+                        intent3.putExtra("order_id", order_goods.getOrder_id());
+                        context.startActivity(intent3);
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+        });
+
+        return convertView;
+    }
+
+}
