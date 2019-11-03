@@ -1,0 +1,61 @@
+第一部分
+public class ItemOrderTop implements OrderContent {
+    private Order order;
+
+    private OnceSendView2 shopImageView;
+    private List<Order_goods> list;
+    private ACache aCache;
+
+    public ItemOrderTop(Order order, List<Order_goods> list) {
+
+        this.order = order;
+        this.list = list;
+    }
+
+    @Override
+    public int getLayout() {
+        return R.layout.item_order_top;
+    }
+
+    @Override
+    public boolean isClickable() {
+        return true;
+    }
+
+    public Order order() {
+        return order;
+    }
+
+    @Override
+    public View getView(final Context context, View convertView, LayoutInflater inflater) {
+        aCache = ACache.get(context);
+        inflater = LayoutInflater.from(context);
+        convertView = inflater.inflate(getLayout(), null);
+
+        final GTextView orderId = (GTextView) convertView.findViewById(R.id.tv_order_num1);
+
+        GTextView orderstatus = (GTextView) convertView.findViewById(R.id.tv_order_state1);
+
+        orderId.setText("订单号码:" + order.getOrder_sn());
+
+
+        switch (order.getStatus().toString()) {
+            case "20":
+                orderstatus.setText("待发货");
+                break;
+            case "30":
+                orderstatus.setText("已发货");
+                break;
+            case "40":
+                orderstatus.setText("已收货待评价");
+                break;
+            default:
+                break;
+
+        }
+
+
+        return convertView;
+    }
+
+}
